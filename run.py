@@ -1,20 +1,16 @@
 from tensorforce import Agent, Environment
 
+from tensorforce.execution import Runner
+
 import DrawingGridEnv
 
+
 # custom environment
-environment = Environment.create(DrawingGridEnv.SimpleGrid, max_episode_timesteps=1000)
+environment = Environment.create(DrawingGridEnv.SimpleGrid, max_episode_timesteps=400)
 
 # Instantiate a Tensorforce agent
 agent = Agent.create(
-    agent='tensorforce',
-    environment=environment,
-    memory=10000,
-    update=dict(unit='timesteps', batch_size=64),
-    optimizer=dict(type='adam', learning_rate=3e-4),
-    policy=dict(network='auto'),
-    objective='policy_gradient',
-    reward_estimation=dict(horizon=20)
+    agent='ppo', environment=environment, batch_size=10, learning_rate=1e-3
 )
 
 # Train for 300 episodes

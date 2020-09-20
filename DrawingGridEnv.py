@@ -4,8 +4,11 @@ import GridController
 
 class params:
   gridSize = 32
-  egoSize = 32
+  egoSize = 31 # should be uneven (centered around agent)
   targetSize = 5
+  stepReward = 0.01
+  maxEpisodeTimesteps = 300
+
 
 class SimpleGrid(Environment):
 
@@ -15,28 +18,27 @@ class SimpleGrid(Environment):
     self.scene_controller = GridController.SceneController(params)
 
   def states(self):
-    return dict(type='int', shape=(32,32))
+    return dict(type='int', shape=(self.params.egoSize,self.params.egoSize))
 
   def actions(self):
 
-    return dict(type='int', num_values=4)
+    return {
+      "move": dict(type="int", num_values=4),
+      "draw": dict(type="int", num_values=2)
+    }
 
-  # Optional: should only be defined if environment has a natural fixed
-  # maximum episode length; restrict training timesteps via
-  #     Environment.create(..., max_episode_timesteps=???)
   def max_episode_timesteps(self):
     return super().max_episode_timesteps()
 
-  # Optional additional steps to close environment
   def close(self):
     super().close()
 
   def reset(self):
-    state = np.random.random(size=(8,))
+    state = np.random.random(size=(self.params.egoSize,self.params.egoSize))
     return state
 
   def execute(self, actions):
-    next_state = self.scene_controller.EnvironmentStep(actions)      # np.random.random(size=(8,))
-    terminal = np.random.random() < 0.5
-    reward = np.random.random()
+    next_state = self.scene_controller.EnvironmentStep(actions)
+    terminal = self.scene_controller.CheckFinished()
+    reward = self.scene_controller.stepReward
     return next_state, terminal, reward

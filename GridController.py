@@ -5,7 +5,6 @@ import matplotlib as mpl
 from matplotlib import pyplot
 
 
-
 class SceneController:
   """
   Scenecontroller
@@ -26,18 +25,106 @@ class SceneController:
     self.gridState_objective = np.zeros(shape=(self.params.gridSize, self.params.gridSize))
     self.gridState_target = np.zeros(shape=(self.params.gridSize, self.params.gridSize))
 
+    # agent variables
     # agentEgoView is the agent's view: an ego-size slice of the gridState, centered on the agent
     self.agentEgoView = np.zeros(shape=(self.egoSize, self.egoSize))
     self.agentPosition = (np.random.randint(0,self.gridSize-1), np.random.randint(0,self.gridSize-1))
 
-  def Move(self):
+    self.stepCount = 0
 
-  
+    # set all episode stuff
+    self.OnEpisodeBegin()
+
+  def OnEpisodeBegin(self):
+
+    self.GenerateTarget()
+    self.gridState.fill(0)
+    self.gridState_objective.fill(1)
+    self.gridState_objective -= self.gridState_target
+    self.stepCount = 0
 
 
-  def Draw(self):
+  def EnvironmentStep(self, action):
+    """
+    central part of code that calls actions, and returns state+1
+    """
+    # reward will be set again in Draw
+    self.stepReward = 0
 
-    raise NotImplementedError
+    # do agent actions
+    self.Move(action["move"])
+    self.Draw(action["draw"])
+
+    # return current state (agent view)
+    self.AjustAgentView()
+
+    self.stepCount+=1
+
+    self.VisualizeGrid()
+
+    return self.agentEgoView
+
+
+  def Move(self, move):
+    """
+    maniputales the agent's position
+    """
+
+    if (move ==0):
+      self.agentPosition[0] -= 1
+    elif (move == 1):
+      self.agentPosition[0] += 1
+    elif (move == 2):
+      self.agentPosition[1] -= 1
+    elif (move == 3):
+      self.agentPosition[1] += 1
+    else:
+      raise ValueError("invalid agent move action")
+
+    np.clip(self.agentPosition, 0, self.gridSize)
+
+
+  def Draw(self, draw):
+
+    if (draw == 0):
+      pass
+    # switch current pixel
+    elif (draw == 1):
+      if self.gridState[self.agentPosition] == 0:
+        self.gridState[self.agentPosition] = 1
+      else:
+        self.gridState[self.agentPosition] = 0
+    else:
+      raise ValueError("invalid agent plot action")
+
+    # reward
+    if draw == 1 and self.gridState[self.agentPosition] == self.gridState_target[self.agentPosition]:
+      self.stepReward = self.params.stepReward
+    elif draw == 1 and self.gridState[self.agentPosition] != self.gridState_target[self.agentPosition]:
+      self.stepReward = -self.params.stepReward
+
+
+  def CheckFinished(self):
+
+    return self.stepCount > self.params.maxEpisodeTimesteps
+
+
+  def AjustAgentView(self):
+    """
+    slices part of the objective grid centered on agent position
+    before that, pads objective state to make slicing easy
+
+    """
+
+    halfEgoSize = np.floor(self.egoSize*0.5)
+
+    padded_objective = np.pad(self.gridState_objective, pad_width=self.egoSize, mode='constant', constant_values=2)
+
+    rows = range(self.agentPosition[0] - halfEgoSize, self.agentPosition[0] + halfEgoSize)
+    columns = range(self.agentPosition[1] - halfEgoSize, self.agentPosition[1] + halfEgoSize)
+
+    self.agentEgoView = padded_objective[rows, columns]
+
 
 
   def GenerateTarget(self):
@@ -45,7 +132,7 @@ class SceneController:
     samples a quadrant that becomes the target
     :MANIPULATES: target grid
     """
-
+    # reset first
     self.gridState_target.fill(0)
 
     rand_quadrant = np.random.randint(0,4)
@@ -61,17 +148,7 @@ class SceneController:
     else:
       raise ValueError('a quadrant should be colored')
 
-    assert (np.sum(self.gridState_target) > 0, "target grid should have content")
-
-
-
-  def EnvironmentStep(self, actions):
-
-    raise NotImplementedError
-
-    # return self.gridState
-
-
+    assert (np.sum(self.gridState_target) >= 1)
 
 
   def VisualizeGrid(self):
