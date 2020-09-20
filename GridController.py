@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot
 
+import matplotlib.cm as cm
+
 
 class SceneController:
   """
@@ -28,7 +30,7 @@ class SceneController:
     # agent variables
     # agentEgoView is the agent's view: an ego-size slice of the gridState, centered on the agent
     self.agentEgoView = np.zeros(shape=(self.egoSize, self.egoSize))
-    self.agentPosition = (np.random.randint(0,self.gridSize-1), np.random.randint(0,self.gridSize-1))
+    self.agentPosition = [np.random.randint(0,self.gridSize-1, dtype=int), np.random.randint(0,self.gridSize-1 , dtype=int)]
 
     self.stepCount = 0
 
@@ -37,8 +39,9 @@ class SceneController:
 
   def OnEpisodeBegin(self):
 
-    self.GenerateTarget()
     self.gridState.fill(0)
+    self.GenerateTarget()
+
     self.gridState_objective.fill(1)
     self.gridState_objective -= self.gridState_target
     self.stepCount = 0
@@ -81,7 +84,7 @@ class SceneController:
     else:
       raise ValueError("invalid agent move action")
 
-    np.clip(self.agentPosition, 0, self.gridSize)
+    self.agentPosition = np.clip(self.agentPosition, 0, self.gridSize-1)
 
 
   def Draw(self, draw):
@@ -90,18 +93,28 @@ class SceneController:
       pass
     # switch current pixel
     elif (draw == 1):
-      if self.gridState[self.agentPosition] == 0:
-        self.gridState[self.agentPosition] = 1
+      if self.gridState[self.agentPosition[0], self.agentPosition[1]] == 0:
+        self.gridState[self.agentPosition[0], self.agentPosition[1]] = 1
       else:
-        self.gridState[self.agentPosition] = 0
+        self.gridState[self.agentPosition[0],self.agentPosition[1]] = 0
+
+      # objective
+      if self.gridState_objective[self.agentPosition[0], self.agentPosition[1]] == 0:
+        self.gridState_objective[self.agentPosition[0], self.agentPosition[1]] = 1
+      else:
+        self.gridState_objective[self.agentPosition[0],self.agentPosition[1]] = 0
+
     else:
       raise ValueError("invalid agent plot action")
 
     # reward
-    if draw == 1 and self.gridState[self.agentPosition] == self.gridState_target[self.agentPosition]:
+    if draw == 1 and self.gridState[tuple(self.agentPosition)] == self.gridState_target[tuple(self.agentPosition)]:
       self.stepReward = self.params.stepReward
-    elif draw == 1 and self.gridState[self.agentPosition] != self.gridState_target[self.agentPosition]:
+    elif draw == 1 and self.gridState[tuple(self.agentPosition)] != self.gridState_target[tuple(self.agentPosition)]:
       self.stepReward = -self.params.stepReward
+
+
+    # todo: implement new objective map
 
 
   def CheckFinished(self):
@@ -116,16 +129,17 @@ class SceneController:
 
     """
 
-    halfEgoSize = np.floor(self.egoSize*0.5)
+    halfEgoSize = np.floor(self.egoSize*0.5).astype(np.int)
 
-    padded_objective = np.pad(self.gridState_objective, pad_width=self.egoSize, mode='constant', constant_values=2)
+    padded_objective = np.pad(self.gridState_objective, pad_width=halfEgoSize, mode='constant', constant_values=2)
 
     rows = range(self.agentPosition[0] - halfEgoSize, self.agentPosition[0] + halfEgoSize)
     columns = range(self.agentPosition[1] - halfEgoSize, self.agentPosition[1] + halfEgoSize)
 
-    self.agentEgoView = padded_objective[rows, columns]
-
-
+    self.agentEgoView = padded_objective[
+                        halfEgoSize + self.agentPosition[0] - halfEgoSize : 1 + halfEgoSize + self.agentPosition[0] + halfEgoSize,
+                        halfEgoSize + self.agentPosition[1] - halfEgoSize : 1 + halfEgoSize + self.agentPosition[1] + halfEgoSize].astype(int)
+    a = 0
 
   def GenerateTarget(self):
     """
@@ -152,7 +166,7 @@ class SceneController:
 
 
   def VisualizeGrid(self):
-    pyplot.figure(figsize=(self.params.egoSize, self.params.egoSize))
-    pyplot.imshow(self.gridState)
-    pyplot.show()
 
+    pyplot.imshow(self.gridState_objective, extent=(0, self.params.gridSize, self.params.gridSize, 0),
+                  interpolation='None', cmap="viridis")
+    a = 3

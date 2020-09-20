@@ -5,7 +5,7 @@ import GridController
 class params:
   gridSize = 32
   egoSize = 31 # should be uneven (centered around agent)
-  targetSize = 5
+  targetSize = 16
   stepReward = 0.01
   maxEpisodeTimesteps = 300
 
@@ -18,7 +18,7 @@ class SimpleGrid(Environment):
     self.scene_controller = GridController.SceneController(params)
 
   def states(self):
-    return dict(type='int', shape=(self.params.egoSize,self.params.egoSize))
+    return dict(type='int', shape=(self.params.egoSize,self.params.egoSize), num_values=3)
 
   def actions(self):
 
