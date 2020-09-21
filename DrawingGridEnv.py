@@ -8,6 +8,7 @@ class params:
   targetSize = 16
   stepReward = 0.01
   maxEpisodeTimesteps = 300
+  episode = 0
 
 
 class SimpleGrid(Environment):
@@ -16,9 +17,10 @@ class SimpleGrid(Environment):
     super().__init__()
     self.params = params
     self.scene_controller = GridController.SceneController(params)
+    self.reward = 0
 
   def states(self):
-    return dict(type='int', shape=(self.params.egoSize,self.params.egoSize), num_values=3)
+    return dict(type='float', shape=(self.params.egoSize,self.params.egoSize)) # , num_values=3
 
   def actions(self):
 
@@ -34,11 +36,18 @@ class SimpleGrid(Environment):
     super().close()
 
   def reset(self):
-    state = np.random.random(size=(self.params.egoSize,self.params.egoSize))
+
+    state = np.zeros(shape=(self.params.egoSize,self.params.egoSize)).astype(np.float)
+
     return state
 
   def execute(self, actions):
     next_state = self.scene_controller.EnvironmentStep(actions)
     terminal = self.scene_controller.CheckFinished()
     reward = self.scene_controller.stepReward
+    self.reward = self.scene_controller.cumreward
+
+    if (terminal):
+      self.scene_controller = GridController.SceneController(params)
+
     return next_state, terminal, reward

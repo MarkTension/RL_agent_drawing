@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fcba4b64-3a3e-4a58-b570-309407cc4272" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DrawingGridEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/DrawingGridEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GridController.py" beforeDir="false" afterPath="$PROJECT_DIR$/GridController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agent.json" beforeDir="false" afterPath="$PROJECT_DIR$/agent.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agent.npz" beforeDir="false" afterPath="$PROJECT_DIR$/agent.npz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoint" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -143,9 +147,19 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/GridController.py</url>
-          <line>171</line>
-          <option name="timeStamp" value="19" />
+          <url>file://$PROJECT_DIR$/DrawingGridEnv.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DrawingGridEnv.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/anaconda/envs/tensorforce/lib/python3.6/site-packages/tensorforce/core/utils/tensor_spec.py</url>
+          <line>327</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
