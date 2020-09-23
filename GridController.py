@@ -25,13 +25,15 @@ class SceneController:
     self.halfEgoSize = np.floor(self.egoSize*0.5).astype(np.int)
 
     # state and objective grids, to be filled later on
-    self.gridState = np.zeros(shape=(self.params.gridSize, self.params.gridSize))
-    self.gridState_objective = np.zeros(shape=(self.params.gridSize, self.params.gridSize))
-    self.gridState_target = np.zeros(shape=(self.params.gridSize, self.params.gridSize))
+    self.gridState = np.zeros(shape=(self.gridSize, self.gridSize))
+    self.gridState_objective = np.zeros(shape=(self.gridSize, self.gridSize))
+    self.gridState_target = np.zeros(shape=(self.gridSize, self.gridSize))
 
     # agent variables
     # agentEgoView is the agent's view: an ego-size slice of the gridState, centered on the agent
     self.agentEgoView = np.zeros(shape=(self.egoSize, self.egoSize))
+    self.agentEgoViewOneHot = np.zeros(shape=(self.egoSize, self.egoSize, 3))
+
     self.agentPosition = [np.random.randint(0,self.gridSize-1, dtype=int), np.random.randint(0,self.gridSize-1 , dtype=int)]
 
     self.stepCount = 0
@@ -41,12 +43,13 @@ class SceneController:
     self.OnEpisodeBegin()
 
     # figure plotting
-    cmap = cm.get_cmap('viridis', 4)
-    plt.figure(figsize=(2, 2))
-    plt.title(f"episode {params.episode}")
-    self.graph = plt.imshow(self.gridState_objective, extent=(0, self.params.gridSize, self.params.gridSize, 0),
-                  interpolation='None', vmin=0, vmax= 2, cmap=cmap)
-    plt.colorbar()
+    if self.params.visualize:
+      cmap = cm.get_cmap('viridis', 4)
+      plt.figure(figsize=(2, 2))
+      plt.title(f"episode {params.episode}")
+      self.graph = plt.imshow(self.gridState_objective, extent=(0, self.gridSize, self.gridSize, 0),
+                    interpolation='None', vmin=0, vmax= 2, cmap=cmap)
+      plt.colorbar()
 
   def OnEpisodeBegin(self):
 
@@ -68,14 +71,15 @@ class SceneController:
 
     # do agent actions
     self.Move(action["move"])
-    self.Draw(action["draw"])
+    self.Draw(action["draw"]) # receives reward here
 
     # return current state (agent view)
     self.AjustAgentView()
     self.stepCount+=1
-    # self.VisualizeGrid()
+    if self.params.visualize:
+      self.VisualizeGrid()
 
-    return self.agentEgoView
+    return self.agentEgoViewOneHot
 
 
   def Move(self, move):
@@ -103,14 +107,17 @@ class SceneController:
       pass
     # switch current pixel
     elif (draw == 1):
-      if self.gridState[self.agentPosition[0], self.agentPosition[1]] == 0:
-        self.gridState[self.agentPosition[0], self.agentPosition[1]] = 1
-      # else:
-      #   self.gridState[self.agentPosition[0],self.agentPosition[1]] = 0
+      if self.gridState[tuple(self.agentPosition)] == 0:
+        self.gridState[tuple(self.agentPosition)] = 1
+
+        goodAction = self.gridState[tuple(self.agentPosition)] == self.gridState_target[tuple(self.agentPosition)]
+        if goodAction:
+          self.stepReward += self.params.stepReward
 
       # objective
       if self.gridState_objective[tuple(self.agentPosition)] == 1:
         self.gridState_objective[tuple(self.agentPosition)] = 0
+
       else:
         pass
 
@@ -118,11 +125,7 @@ class SceneController:
       raise ValueError("invalid agent plot action")
 
     # reward
-    if draw == 1 and self.gridState[tuple(self.agentPosition)] == self.gridState_target[tuple(self.agentPosition)]:
-      self.stepReward = self.params.stepReward
-    # elif draw == 1 and self.gridState[tuple(self.agentPosition)] != self.gridState_target[tuple(self.agentPosition)]:
-    #   self.stepReward = -self.params.stepReward
-    self.cumreward += self.stepReward
+
 
 
   def CheckFinished(self):
@@ -143,13 +146,16 @@ class SceneController:
 
     padded_objective = np.pad(self.gridState_objective, pad_width=self.halfEgoSize, mode='constant', constant_values=2)
 
-    rows = range(self.agentPosition[0] - self.halfEgoSize, self.agentPosition[0] + self.halfEgoSize)
-    columns = range(self.agentPosition[1] - self.halfEgoSize, self.agentPosition[1] + self.halfEgoSize)
-
     self.agentEgoView = padded_objective[
                         self.halfEgoSize + self.agentPosition[0] - self.halfEgoSize : 1 + self.halfEgoSize + self.agentPosition[0] + self.halfEgoSize,
                         self.halfEgoSize + self.agentPosition[1] - self.halfEgoSize : 1 + self.halfEgoSize + self.agentPosition[1] + self.halfEgoSize].astype(int)
-    a = 0
+
+    # self.agentEgoViewOneHot =
+
+    n_values = 3
+    self.agentEgoViewOneHot = np.eye(n_values)[self.agentEgoView]
+
+
 
   def GenerateTarget(self):
     """
@@ -188,5 +194,4 @@ class SceneController:
     size = np.floor(self.egoSize/2).astype(np.int)
     visualization2[size, size] = 1.5
     self.graph.set_data(visualization2)
-    # self.graphs2.set_data(self.gridState)
     plt.pause(0.0001)

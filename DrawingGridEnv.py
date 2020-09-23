@@ -9,6 +9,7 @@ class params:
   stepReward = 0.01
   maxEpisodeTimesteps = 300
   episode = 0
+  visualize = False
 
 
 class SimpleGrid(Environment):
@@ -20,7 +21,7 @@ class SimpleGrid(Environment):
     self.reward = 0
 
   def states(self):
-    return dict(type='float', shape=(self.params.egoSize,self.params.egoSize)) # , num_values=3
+    return dict(type='float', shape=(self.params.egoSize,self.params.egoSize, 3)) # , num_values=3
 
   def actions(self):
 
@@ -36,8 +37,9 @@ class SimpleGrid(Environment):
     super().close()
 
   def reset(self):
-
-    state = np.zeros(shape=(self.params.egoSize,self.params.egoSize)).astype(np.float)
+    # self.scene_controller = GridController.SceneController(params)
+    state = self.scene_controller.agentEgoViewOneHot
+    # state = np.zeros(shape=(self.params.egoSize,self.params.egoSize, 1))
 
     return state
 
@@ -45,7 +47,10 @@ class SimpleGrid(Environment):
     next_state = self.scene_controller.EnvironmentStep(actions)
     terminal = self.scene_controller.CheckFinished()
     reward = self.scene_controller.stepReward
-    self.reward = self.scene_controller.cumreward
+    # self.reward = self.scene_controller.cumreward
+
+    # if (reward>0):
+    #   print(f"reward is {reward}")
 
     if (terminal):
       self.scene_controller = GridController.SceneController(params)

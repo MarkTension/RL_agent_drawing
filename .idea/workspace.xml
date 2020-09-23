@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fcba4b64-3a3e-4a58-b570-309407cc4272" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DrawingGridEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/DrawingGridEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GridController.py" beforeDir="false" afterPath="$PROJECT_DIR$/GridController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agent.json" beforeDir="false" afterPath="$PROJECT_DIR$/agent.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agent.npz" beforeDir="false" afterPath="$PROJECT_DIR$/agent.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/summaries/summary-20200921-101519/events.out.tfevents.1600676119.SuMaKuBook.local.60146.4.v2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/summaries/summary-20200921-155444/events.out.tfevents.1600696484.SuMaKuBook.local.62739.4.v2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/summaries/summary-20200921-155839/events.out.tfevents.1600696719.SuMaKuBook.local.62787.4.v2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/summaries/summary-20200921-160124/events.out.tfevents.1600696884.SuMaKuBook.local.62823.4.v2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/summaries/summary-20200921-160445/events.out.tfevents.1600697085.SuMaKuBook.local.62870.4.v2" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -147,19 +148,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DrawingGridEnv.py</url>
-          <line>39</line>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/DrawingGridEnv.py</url>
-          <line>35</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/anaconda/envs/tensorforce/lib/python3.6/site-packages/tensorforce/core/utils/tensor_spec.py</url>
           <line>327</line>
           <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/DrawingGridEnv.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="30" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
